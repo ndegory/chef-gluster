@@ -46,7 +46,7 @@ when 'ubuntu'
       File.exist?("/etc/apt/sources.list.d/glusterfs-#{node['gluster']['version']}.list")
     end
   end
-when 'redhat', 'centos', 'amazon'
+when 'redhat', 'centos'
   # CentOS 6 and 7 have Gluster in the Storage SIG instead of a gluster hosted repo
   repo_url = if node['platform_version'].to_i > 5
                "http://mirror.centos.org/centos/$releasever/storage/$basearch/gluster-#{node['gluster']['version']}/"
@@ -54,6 +54,13 @@ when 'redhat', 'centos', 'amazon'
                "http://download.gluster.org/pub/gluster/glusterfs/#{node['gluster']['version']}/LATEST/EPEL.repo/epel-$releasever/$basearch/"
              end
 
+  yum_repository 'glusterfs' do
+    url repo_url
+    gpgcheck false
+    action :create
+  end
+when 'amazon'
+  repo_url = "http://mirror.centos.org/centos/6/storage/$basearch/gluster-#{node['gluster']['version']}/"
   yum_repository 'glusterfs' do
     url repo_url
     gpgcheck false

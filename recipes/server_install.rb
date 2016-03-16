@@ -44,5 +44,5 @@ service 'glusterfsd' do
   else
     action [:disable, :stop]
   end
-  only_if { node['platform_family'] == 'rhel' && node['platform_version'].to_f >= 7.0 }
+  only_if { node['platform_family'] == 'rhel' && node['platform_version'].to_f >= 7.0 && node['platform'] := 'amazon'} 
 end
