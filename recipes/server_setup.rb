@@ -66,7 +66,7 @@ node['gluster']['server']['volumes'].each do |volume_name, volume_values|
         retry_delay node['gluster']['server']['peer_retry_delay']
       end
       # Wait here until the peer reaches connected status (needed for volume create later)
-      execute "gluster peer status | grep -A 2 #{peer} | tail -1 | grep 'Peer in Cluster (Connected)'" do
+      execute "gluster peer status | sed -e '/Other names:/d' | grep -A 2 -B 1 #{peer} | grep 'Peer in Cluster (Connected)'" do
         action :run
         retries node['gluster']['server']['peer_wait_retries']
         retry_delay node['gluster']['server']['peer_wait_retry_delay']
@@ -78,8 +78,7 @@ node['gluster']['server']['volumes'].each do |volume_name, volume_values|
       # Create a hash of peers and their bricks
       volume_bricks = {}
       brick_count = 0
-      peers = volume_values.attribute?('peer_names') ? volume_values['peer_names'] : volume_values['peers']
-      peers.each do |peer|
+      volume_values['peers'].each do |peer|
         # As every server will be running the same code, we know what the brick paths will be on every node
         if node['gluster']['server']['volumes'][volume_name].attribute?('bricks')
           peer_bricks = node['gluster']['server']['volumes'][volume_name]['bricks']
